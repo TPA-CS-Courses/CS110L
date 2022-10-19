@@ -9,6 +9,8 @@ fn main() {
     println!("{}", ref3.to_uppercase());
 }
 ```
+error:  s = String::from("goodbye");
+cannot assign to `s` because it is borrowed.
 
 
 
@@ -19,8 +21,9 @@ fn drip_drop() -> &String {
     return &s;
 }
 ```
-
-
+s的生命周期是函数内。
+而函数返回之后生命周期就超过函数内了，所以借用不合法。
+悬垂引用
 
 Example 3:
 ```
@@ -32,3 +35,9 @@ fn main() {
     println!("{}", s2);
 }
 ```
+其实，Vec类型使用index访问时，是不能使用索引操作进行move的。
+因为index方法是使用Vec的引用&self定义的(参考上面的Index trait实现)。
+所以使用索引访问时，Vec中的元素元素需要实现了Copy。或者使用元素的引用来进行赋值给其他变量。
+上面的String类型没有实现Copy特征，因此会报错。
+
+https://zhuanlan.zhihu.com/p/507503510
