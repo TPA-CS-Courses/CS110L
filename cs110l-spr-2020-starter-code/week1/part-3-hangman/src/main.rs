@@ -37,11 +37,16 @@ fn main() {
     println!("random word: {}", secret_word);
 
     // Your code here! :)
-    let mut plant_word = String::from("--------"); 
-    let mut plant_word_chars: Vec<char> = plant_word.chars().collect();
+
+    let mut plant_word = String::new();
+    for i in 0 .. secret_word.len() {
+        plant_word.push('-');
+    }
     let mut guessed_word = String::new();
     let mut num_left = secret_word.len();
+    let mut secret_left = secret_word.len();
     loop {
+        let mut plant_word_chars :Vec<char>  = plant_word.chars().collect();
         println!("The word so far is {}", plant_word);
         println!("You have guessed the following letters: {}", guessed_word);
         println!("You have {} guesses left", num_left);
@@ -54,21 +59,28 @@ fn main() {
         let char_vec: Vec<char> = guess.chars().collect();
         let char_read = char_vec[0];
         guessed_word.push(char_read);
-        // println!("read: {}", );
         let mut flag = false;
         for i in 0 .. secret_word_chars.len() {
-            println!("plant:{}, secret:{}", plant_word_chars[i], secret_word_chars[i]);
+            // println!("plant:{}, secret:{}", plant_word_chars[i], secret_word_chars[i]);
             if plant_word_chars[i] == '-' && secret_word_chars[i] == char_read {
-                plant_word_chars[i] = char_read;
-                num_left = num_left - 1;
+                plant_word.remove(i);
+                plant_word.insert(i, char_read);
+                secret_left = secret_left - 1;
                 flag = true;
                 break;
             } 
         }
         if flag == false {
             println!("Sorry, that letter is not in the word");
+            num_left = num_left - 1;
         }
-        println!("");
-        println!("");
+        if num_left == 0 {
+            println!("Sorry, you ran out of guesses!");
+            break;
+        }
+        if secret_left == 0 {
+            println!("Congratulations you guessed the secret word: {}!", secret_word);
+            break;
+        }
     }
 }
