@@ -3,5 +3,5 @@
 
 ## Assignments:
 - [x] Week 1 Exercises: Hello world
-- [ ] Week 2 Exercises: Ownership and structs
+- [x] Week 2 Exercises: Ownership and structs
 
