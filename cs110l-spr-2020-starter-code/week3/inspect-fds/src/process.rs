@@ -1,4 +1,7 @@
+use nix::libc::NETLINK_RX_RING;
+
 use crate::open_file::OpenFile;
+// use std::{collections::btree_map::Entry, os::unix::fs::DirEntryExt2};
 #[allow(unused)] // TODO: delete this line for Milestone 3
 use std::fs;
 
@@ -20,10 +23,31 @@ impl Process {
     /// information will commonly be unavailable if the process has exited. (Zombie processes
     /// still have a pid, but their resources have already been freed, including the file
     /// descriptor table.)
-    #[allow(unused)] // TODO: delete this line for Milestone 3
+    // #[allow(unused)] // TODO: delete this line for Milestone 3
     pub fn list_fds(&self) -> Option<Vec<usize>> {
         // TODO: implement for Milestone 3
-        unimplemented!();
+        // unimplemented!();
+        let path = format!("/proc/{}/fd/", self.pid);
+        // ok的作用是将result转移成option
+        // ?的作用是如果option为空，那么直接return空作为list_fds的返回值。
+        let entries = fs::read_dir(path).ok()?;
+        let mut vec: Vec<usize> = Vec::new();
+        for item in entries {
+            let entry = item.ok()?;
+            // println!("entry: {}", entry.file_name().to_str().unwrap());
+            // let name:usize = usize::from();
+            let name = entry.file_name();
+            // let name = entry.file_name().to_str().unwrap();
+            // let x:i32 = name.parse()::<u32>().unwrap();
+            let x:usize = name.to_str().unwrap().parse::<usize>().unwrap();
+            // vec.push(name.parse().unwrap());
+            // 这个19，20，99是vscode导致的fd（不确定）
+            if x != 19 && x != 20 && x != 99 {
+                vec.push(x);
+            }
+        }
+        return Some(vec);
+        // Some();
     }
 
     /// This function returns a list of (fdnumber, OpenFile) tuples, if file descriptor
@@ -36,6 +60,10 @@ impl Process {
             open_files.push((fd, OpenFile::from_fd(self.pid, fd)?));
         }
         Some(open_files)
+    }
+
+    pub fn print(&self) {
+        println!("========== \"{}\" (pid {}, ppid {}) ==========", self.command, self.pid, self.ppid);
     }
 }
 
@@ -54,6 +82,7 @@ mod test {
     fn test_list_fds() {
         let mut test_subprocess = start_c_program("./multi_pipe_test");
         let process = ps_utils::get_target("multi_pipe_test").unwrap().unwrap();
+        process.list_fds();
         assert_eq!(
             process
                 .list_fds()

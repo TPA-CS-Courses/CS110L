@@ -22,6 +22,18 @@ fn main() {
         }, 
         Some(process) => {
             println!("Found pid {}", process.pid);
+            process.print();
+            let list = process.list_fds();
+            match list {
+                None => {
+                    println!("None");
+                },
+                Some(vec) => {
+                    for item in vec {
+                        println!("{}", item);
+                    }
+                }
+            }
         }   
     }
 
