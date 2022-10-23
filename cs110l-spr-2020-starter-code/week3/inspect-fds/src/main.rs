@@ -34,6 +34,10 @@ fn main() {
                     }
                 }
             }
+            let children = ps_utils::get_child_processes(process.pid).expect("a problem happened");
+            for item in children {
+                item.print();
+            }
         }   
     }
 
