@@ -1,4 +1,4 @@
-use std::collections::VecDeque;
+use std::{collections::VecDeque, thread::JoinHandle, rc::Rc, borrow::BorrowMut};
 #[allow(unused_imports)]
 use std::sync::{Arc, Mutex};
 use std::time::Instant;
@@ -72,11 +72,52 @@ fn main() {
     let start = Instant::now();
 
     // TODO: call get_input_numbers() and store a queue of numbers to factor
-
+    // let vec = get_input_numbers();
+    let vec_ptr = Arc::new(Mutex::new(get_input_numbers()));
+    // let vec_ptr = Arc::new(Mutex::new(vec));
     // TODO: spawn `num_threads` threads, each of which pops numbers off the queue and calls
     // factor_number() until the queue is empty
+    let mut handlers:Vec<JoinHandle<()>> = Vec::new();
+    // let handler = thread::spawn(move || {
+    //     while vec.is_empty() == false {
+    //         let num = vec.pop_front();
+    //         match num {
+    //             Some(i) => {
+    //                 factor_number(i);
+    //             }, 
+    //             None => {
+    //                 break;
+    //             }
+    //         }
+    //         // factor_number(num);
+    //     };});
+    // handler.join();
 
+    for i in 0 .. num_threads {
+        let vec_ptr_ref = vec_ptr.clone();
+        let handler = thread::spawn(move || {
+            // let myvec = vec_ptr_ref.borrow_mut();
+            let mut myvec = vec_ptr_ref.lock().unwrap();
+            // myvec.is_empty()
+            while (*myvec).is_empty() == false {
+                let num = (*myvec).pop_front();
+                match num {
+                    Some(i) => {
+                        factor_number(i);
+                    }, 
+                    None => {
+                        break;
+                    }
+                }
+                // factor_number(num);
+            };
+            // let num = vec.pop_front();
+        });
+        handlers.push(handler);
+    }
     // TODO: join all the threads you created
-
+    for handle in handlers {
+        handle.join();
+    }
     println!("Total execution time: {:?}", start.elapsed());
 }
