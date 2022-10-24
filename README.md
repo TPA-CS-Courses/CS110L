@@ -5,3 +5,5 @@
 - [x] Week 1 Exercises: Hello world
 - [x] Week 2 Exercises: Ownership and structs
 - [X] Week 3 Exercises: Error handling, I/O, and traits
+- [x] Week 4 Exercises: Checking in
+- [x] Week 5 Exercises: Farm meets multithreading
